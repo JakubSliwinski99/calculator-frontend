@@ -34,17 +34,60 @@ const variantStyles: Record<ButtonVariant, string> = {
   equals: "bg-[#f89131]",
 };
 
+type CalculatorState = {
+  number: string;
+  operation: string;
+};
+
 const DISALLOWED_CHARACTERS = /[^0-9.]/g;
 
 function sanitizeDisplayValue(value: string) {
   return value.replace(DISALLOWED_CHARACTERS, "");
 }
 
+function normalizeDisplayValue(value: string) {
+  const sanitized = sanitizeDisplayValue(value);
+
+  if (sanitized === ".") {
+    return "0.";
+  }
+
+  const dotIndex = sanitized.indexOf(".");
+  if (dotIndex !== -1) {
+    return (
+      sanitized.slice(0, dotIndex + 1) +
+      sanitized.slice(dotIndex + 1).replace(/\./g, "")
+    );
+  }
+
+  return sanitized;
+}
+
+function appendCharacter(current: string, character: string) {
+  if (character === ".") {
+    if (current === "") {
+      return "0.";
+    }
+
+    if (current.includes(".")) {
+      return current;
+    }
+
+    return `${current}.`;
+  }
+
+  return normalizeDisplayValue(current + character);
+}
+
 export default function Home() {
   const [display, setDisplay] = useState("");
+  const [calculatorState, setCalculatorState] = useState<CalculatorState>({
+    number: "",
+    operation: "",
+  });
 
   function handleDisplayChange(value: string) {
-    setDisplay(sanitizeDisplayValue(value));
+    setDisplay(normalizeDisplayValue(value));
   }
 
   function handleDisplayKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
@@ -59,7 +102,7 @@ export default function Home() {
       return;
     }
 
-    setDisplay((current) => sanitizeDisplayValue(current + button.label));
+    setDisplay((current) => appendCharacter(current, button.label));
   }
 
   return (
