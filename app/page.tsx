@@ -58,6 +58,24 @@ function mapOperation(operationLabel: string) {
   return OPERATION_MAP[operationLabel] ?? operationLabel;
 }
 
+const KEYBOARD_TO_BUTTON_LABEL: Record<string, string> = {
+  "+": "+",
+  "-": "−",
+  "/": "÷",
+  "*": "×",
+  Enter: "=",
+  NumpadEnter: "=",
+};
+
+function getButtonForKeyboardKey(key: string) {
+  const label = KEYBOARD_TO_BUTTON_LABEL[key];
+  if (!label) {
+    return undefined;
+  }
+
+  return BUTTONS.find((button) => button.label === label);
+}
+
 function limitDisplayLength(value: string) {
   return value.slice(0, MAX_DISPLAY_LENGTH);
 }
@@ -132,6 +150,14 @@ export default function Home() {
   }
 
   function handleDisplayKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
+    const operatorOrEqualsButton = getButtonForKeyboardKey(event.key);
+
+    if (operatorOrEqualsButton) {
+      event.preventDefault();
+      handleOperatorOrEqualsClick(operatorOrEqualsButton);
+      return;
+    }
+
     if (event.key === "Backspace") {
       event.preventDefault();
       setDisplay("");
