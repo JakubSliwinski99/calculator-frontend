@@ -143,11 +143,12 @@ export default function Home() {
 
     if (button.variant === "operator") {
       console.log("send request");
-      setDisplay("");
       setCalculatorState({
         number: "",
         operation: button.label,
       });
+      setDisplay("");
+      return;
     }
   }
 
