@@ -182,8 +182,6 @@ export default function Home() {
         operation: mapOperation(calculatorState.operation),
       });
 
-      console.log(response);
-
       if (response.error !== null) {
         setDisplay("ERR");
         setCalculatorState({
@@ -201,7 +199,7 @@ export default function Home() {
         willClearDisplay: true,
       });
     } catch {
-      setDisplay("CHUJ");
+      setDisplay("ERR");
       setCalculatorState({
         number: "",
         operation: "",
@@ -212,13 +210,11 @@ export default function Home() {
 
   async function handleOperatorOrEqualsClick(button: CalculatorButton) {
     if (display === "") {
-      console.log("do nothing");
       return;
     }
 
     if (calculatorState.number === "") {
       if (button.variant === "equals") {
-        console.log("do nothing");
         return;
       }
 
@@ -229,7 +225,6 @@ export default function Home() {
           willClearDisplay: false,
         });
         setDisplay("");
-        console.log("number populated");
       }
 
       return;
@@ -237,7 +232,6 @@ export default function Home() {
 
     if (calculatorState.operation === "") {
       if (button.variant === "equals") {
-        console.log("do nothing");
         return;
       }
       if (button.variant === "operator") {
@@ -247,13 +241,11 @@ export default function Home() {
           willClearDisplay: false,
         });
         setDisplay("");
-        console.log("number populated");
         return;
       }
     } 
 
     if (button.variant === "equals" || button.variant === "operator") {
-      console.log("send request");
       await handleCalculationRequest(button);
     }
   }
