@@ -107,7 +107,56 @@ export default function Home() {
     }
   }
 
+  function handleOperatorOrEqualsClick(button: CalculatorButton) {
+    if (display === "") {
+      console.log("do nothing");
+      return;
+    }
+
+    if (calculatorState.number === "") {
+      if (button.variant === "equals") {
+        console.log("do nothing");
+        return;
+      }
+
+      if (button.variant === "operator") {
+        setCalculatorState({
+          number: display,
+          operation: button.label,
+        });
+        setDisplay("");
+        console.log("number populated");
+      }
+
+      return;
+    }
+
+    if (button.variant === "equals") {
+      console.log("send request");
+      setCalculatorState({
+        number: "",
+        operation: "",
+      });
+      setDisplay("");
+      return;
+    }
+
+    if (button.variant === "operator") {
+      console.log("send request");
+      setDisplay("");
+      setCalculatorState({
+        number: "",
+        operation: button.label,
+      });
+    }
+  }
+
   function handleButtonClick(button: CalculatorButton) {
+    if (button.variant === "operator" || button.variant === "equals") {
+      handleOperatorOrEqualsClick(button);
+      return;
+    }
+
     if (button.variant !== "number" || !/^[\d.]$/.test(button.label)) {
       return;
     }
