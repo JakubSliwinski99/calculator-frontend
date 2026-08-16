@@ -283,25 +283,39 @@ export default function Home() {
       className="flex flex-1 items-center justify-center bg-white p-8 max-[450px]:fixed max-[450px]:inset-0 max-[450px]:h-dvh max-[450px]:w-full max-[450px]:items-stretch max-[450px]:bg-[#2d2f36] max-[450px]:p-0"
       onMouseDown={focusDisplayInput}
     >
-      <div className="flex w-72 flex-col rounded-[28px] border-[6px] border-[#545a66] bg-[#2d2f36] p-4 shadow-[8px_8px_0_rgba(0,0,0,0.15)] max-[450px]:h-full max-[450px]:min-h-0 max-[450px]:w-full max-[450px]:flex-1 max-[450px]:rounded-none max-[450px]:border-0 max-[450px]:px-3 max-[450px]:pt-4 max-[450px]:pb-4 max-[450px]:shadow-none">
-        <input
-          ref={displayInputRef}
-          type="text"
-          inputMode="decimal"
-          pattern="[0-9.]*"
-          maxLength={MAX_DISPLAY_LENGTH}
-          value={display}
-          autoFocus
-          onBlur={() => {
-            requestAnimationFrame(() => displayInputRef.current?.focus());
-          }}
-          onChange={(event) => handleDisplayChange(event.target.value)}
-          onKeyDown={handleDisplayKeyDown}
-          aria-label="Calculator display"
-          className="mt-4 mb-4 h-16 w-full shrink-0 rounded-lg border-none bg-[#d1d1d1] px-4 text-right text-3xl font-bold caret-transparent text-[#2d2f36] outline-none max-[450px]:mt-0 max-[450px]:h-[18dvh] max-[450px]:min-h-16 max-[450px]:text-[clamp(2rem,8vw,3rem)]"
+      <div className="flex w-72 flex-col rounded-[28px] border-[6px] border-[#545a66] bg-[#2d2f36] p-4 shadow-[8px_8px_0_rgba(0,0,0,0.15)] max-[450px]:h-full max-[450px]:min-h-0 max-[450px]:w-full max-[450px]:flex-1 max-[450px]:rounded-none max-[450px]:border-0 max-[450px]:p-0 max-[450px]:shadow-none">
+        <div
+          aria-hidden
+          className="hidden min-h-0 flex-1 max-[450px]:block"
         />
 
-        <div className="flex min-h-0 flex-1 flex-col max-[450px]:justify-center">
+        <div className="mt-4 mb-4 shrink-0 max-[450px]:mx-3 max-[450px]:my-0">
+          <div className="relative h-16 w-full max-[450px]:h-0 max-[450px]:pb-[calc((100%-0.75rem*3)/4)]">
+            <input
+              ref={displayInputRef}
+              type="text"
+              inputMode="decimal"
+              pattern="[0-9.]*"
+              maxLength={MAX_DISPLAY_LENGTH}
+              value={display}
+              autoFocus
+              onBlur={() => {
+                requestAnimationFrame(() => displayInputRef.current?.focus());
+              }}
+              onChange={(event) => handleDisplayChange(event.target.value)}
+              onKeyDown={handleDisplayKeyDown}
+              aria-label="Calculator display"
+              className="absolute inset-0 rounded-lg border-none bg-[#d1d1d1] px-4 text-right text-3xl font-bold caret-transparent text-[#2d2f36] outline-none max-[450px]:text-[clamp(2rem,8vw,3rem)]"
+            />
+          </div>
+        </div>
+
+        <div
+          aria-hidden
+          className="hidden min-h-0 flex-1 max-[450px]:block"
+        />
+
+        <div className="flex min-h-0 flex-1 flex-col justify-center max-[450px]:mx-3 max-[450px]:flex-none">
           <button
             type="button"
             onMouseDown={(event) => event.preventDefault()}
@@ -324,6 +338,11 @@ export default function Home() {
             ))}
           </div>
         </div>
+
+        <div
+          aria-hidden
+          className="hidden min-h-0 flex-1 max-[450px]:block"
+        />
       </div>
     </div>
   );
