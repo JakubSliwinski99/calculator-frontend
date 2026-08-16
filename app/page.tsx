@@ -1,7 +1,7 @@
 "use client";
 
 import { calculate } from "@/lib/calculation-api";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 type ButtonVariant = "number" | "operator" | "equals";
 
@@ -124,12 +124,21 @@ function appendCharacter(current: string, character: string) {
 }
 
 export default function Home() {
+  const displayInputRef = useRef<HTMLInputElement>(null);
   const [display, setDisplay] = useState("");
   const [calculatorState, setCalculatorState] = useState<CalculatorState>({
     number: "",
     operation: "",
     willClearDisplay: false,
   });
+
+  useEffect(() => {
+    displayInputRef.current?.focus();
+  }, []);
+
+  function focusDisplayInput() {
+    displayInputRef.current?.focus();
+  }
 
   function clearWillClearDisplayFlag() {
     setCalculatorState((state) => ({
@@ -269,18 +278,26 @@ export default function Home() {
   }
 
   return (
-    <div className="flex flex-1 items-center justify-center bg-white p-8 max-[450px]:fixed max-[450px]:inset-0 max-[450px]:h-dvh max-[450px]:w-full max-[450px]:items-stretch max-[450px]:bg-[#2d2f36] max-[450px]:p-0">
+    <div
+      className="flex flex-1 items-center justify-center bg-white p-8 max-[450px]:fixed max-[450px]:inset-0 max-[450px]:h-dvh max-[450px]:w-full max-[450px]:items-stretch max-[450px]:bg-[#2d2f36] max-[450px]:p-0"
+      onMouseDown={focusDisplayInput}
+    >
       <div className="flex w-72 flex-col rounded-[28px] border-[6px] border-[#545a66] bg-[#2d2f36] p-4 shadow-[8px_8px_0_rgba(0,0,0,0.15)] max-[450px]:h-full max-[450px]:min-h-0 max-[450px]:w-full max-[450px]:flex-1 max-[450px]:rounded-none max-[450px]:border-0 max-[450px]:px-3 max-[450px]:pt-4 max-[450px]:pb-4 max-[450px]:shadow-none">
         <input
+          ref={displayInputRef}
           type="text"
           inputMode="decimal"
           pattern="[0-9.]*"
           maxLength={MAX_DISPLAY_LENGTH}
           value={display}
+          autoFocus
+          onBlur={() => {
+            requestAnimationFrame(() => displayInputRef.current?.focus());
+          }}
           onChange={(event) => handleDisplayChange(event.target.value)}
           onKeyDown={handleDisplayKeyDown}
           aria-label="Calculator display"
-          className="mt-4 mb-4 h-16 w-full shrink-0 rounded-lg border-none bg-[#d1d1d1] px-4 text-right text-3xl font-bold text-[#2d2f36] outline-none max-[450px]:mt-0 max-[450px]:h-[18dvh] max-[450px]:min-h-16 max-[450px]:text-[clamp(2rem,8vw,3rem)]"
+          className="mt-4 mb-4 h-16 w-full shrink-0 rounded-lg border-none bg-[#d1d1d1] px-4 text-right text-3xl font-bold caret-transparent text-[#2d2f36] outline-none max-[450px]:mt-0 max-[450px]:h-[18dvh] max-[450px]:min-h-16 max-[450px]:text-[clamp(2rem,8vw,3rem)]"
         />
 
         <div className="flex min-h-0 flex-1 flex-col max-[450px]:justify-center">
@@ -289,6 +306,7 @@ export default function Home() {
               <button
                 key={button.label}
                 type="button"
+                onMouseDown={(event) => event.preventDefault()}
                 onClick={() => handleButtonClick(button)}
                 className={`flex aspect-square w-full items-center justify-center rounded-xl text-4xl font-bold text-white max-[450px]:rounded-lg max-[450px]:text-[clamp(2rem,8vw,3rem)] ${variantStyles[button.variant]}`}
               >
