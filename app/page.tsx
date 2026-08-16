@@ -38,6 +38,7 @@ const variantStyles: Record<ButtonVariant, string> = {
 type CalculatorState = {
   number: string;
   operation: string;
+  willClearDisplay: boolean;
 };
 
 const DISALLOWED_CHARACTERS = /[^0-9.]/g;
@@ -109,9 +110,24 @@ export default function Home() {
   const [calculatorState, setCalculatorState] = useState<CalculatorState>({
     number: "",
     operation: "",
+    willClearDisplay: false,
   });
 
+  function clearWillClearDisplayFlag() {
+    setCalculatorState((state) => ({
+      ...state,
+      willClearDisplay: false,
+    }));
+  }
+
   function handleDisplayChange(value: string) {
+    if (calculatorState.willClearDisplay) {
+      const newPart = value.startsWith(display) ? value.slice(display.length) : value;
+      clearWillClearDisplayFlag();
+      setDisplay(normalizeDisplayValue(newPart));
+      return;
+    }
+
     setDisplay(normalizeDisplayValue(value));
   }
 
@@ -119,6 +135,7 @@ export default function Home() {
     if (event.key === "Backspace") {
       event.preventDefault();
       setDisplay("");
+      clearWillClearDisplayFlag();
     }
   }
 
@@ -137,6 +154,7 @@ export default function Home() {
         setCalculatorState({
           number: "",
           operation: "",
+          willClearDisplay: false,
         });
         return;
       }
@@ -145,12 +163,14 @@ export default function Home() {
       setCalculatorState({
         number: response.result,
         operation: button.variant === "operator" ? button.label : "",
+        willClearDisplay: true,
       });
     } catch {
       setDisplay("CHUJ");
       setCalculatorState({
         number: "",
         operation: "",
+        willClearDisplay: false,
       });
     }
   }
@@ -171,6 +191,7 @@ export default function Home() {
         setCalculatorState({
           number: display,
           operation: button.label,
+          willClearDisplay: false,
         });
         setDisplay("");
         console.log("number populated");
@@ -180,13 +201,20 @@ export default function Home() {
     }
 
     if (calculatorState.operation === "") {
-      setCalculatorState({
-        number: display,
-        operation: button.label,
-      });
-      setDisplay("");
-      console.log("number populated");
-      return;
+      if (button.variant === "equals") {
+        console.log("do nothing");
+        return;
+      }
+      if (button.variant === "operator") {
+        setCalculatorState({
+          number: display,
+          operation: button.label,
+          willClearDisplay: false,
+        });
+        setDisplay("");
+        console.log("number populated");
+        return;
+      }
     } 
 
     if (button.variant === "equals" || button.variant === "operator") {
@@ -205,7 +233,13 @@ export default function Home() {
       return;
     }
 
-    setDisplay((current) => appendCharacter(current, button.label));
+    const base = calculatorState.willClearDisplay ? "" : display;
+
+    if (calculatorState.willClearDisplay) {
+      clearWillClearDisplayFlag();
+    }
+
+    setDisplay(appendCharacter(base, button.label));
   }
 
   return (
