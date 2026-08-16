@@ -22,6 +22,8 @@ export async function calculate(
     body: JSON.stringify(request),
   });
 
+  console.log(response);
+
   if (!response.ok) {
     throw new Error(`Calculation request failed with status ${response.status}`);
   }

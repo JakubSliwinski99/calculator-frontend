@@ -1,5 +1,6 @@
 "use client";
 
+import { calculate } from "@/lib/calculation-api";
 import { useState } from "react";
 
 type ButtonVariant = "number" | "operator" | "equals";
@@ -41,6 +42,20 @@ type CalculatorState = {
 
 const DISALLOWED_CHARACTERS = /[^0-9.]/g;
 const MAX_DISPLAY_LENGTH = 10;
+
+const OPERATION_MAP: Record<string, string> = {
+  "+": "addition",
+  "−": "subtraction",
+  "-": "subtraction",
+  "÷": "division",
+  "×": "multiplication",
+  x: "multiplication",
+  X: "multiplication",
+};
+
+function mapOperation(operationLabel: string) {
+  return OPERATION_MAP[operationLabel] ?? operationLabel;
+}
 
 function limitDisplayLength(value: string) {
   return value.slice(0, MAX_DISPLAY_LENGTH);
@@ -107,7 +122,40 @@ export default function Home() {
     }
   }
 
-  function handleOperatorOrEqualsClick(button: CalculatorButton) {
+  async function handleCalculationRequest(button: CalculatorButton) {
+    try {
+      const response = await calculate({
+        number1: parseFloat(calculatorState.number),
+        number2: parseFloat(display),
+        operation: mapOperation(calculatorState.operation),
+      });
+
+      console.log(response);
+
+      if (response.error !== null) {
+        setDisplay("ERR");
+        setCalculatorState({
+          number: "",
+          operation: "",
+        });
+        return;
+      }
+
+      setDisplay(limitDisplayLength(response.result));
+      setCalculatorState({
+        number: response.result,
+        operation: button.variant === "operator" ? button.label : "",
+      });
+    } catch {
+      setDisplay("CHUJ");
+      setCalculatorState({
+        number: "",
+        operation: "",
+      });
+    }
+  }
+
+  async function handleOperatorOrEqualsClick(button: CalculatorButton) {
     if (display === "") {
       console.log("do nothing");
       return;
@@ -131,24 +179,19 @@ export default function Home() {
       return;
     }
 
-    if (button.variant === "equals") {
-      console.log("send request");
+    if (calculatorState.operation === "") {
       setCalculatorState({
-        number: "",
-        operation: "",
-      });
-      setDisplay("");
-      return;
-    }
-
-    if (button.variant === "operator") {
-      console.log("send request");
-      setCalculatorState({
-        number: "",
+        number: display,
         operation: button.label,
       });
       setDisplay("");
+      console.log("number populated");
       return;
+    } 
+
+    if (button.variant === "equals" || button.variant === "operator") {
+      console.log("send request");
+      await handleCalculationRequest(button);
     }
   }
 
