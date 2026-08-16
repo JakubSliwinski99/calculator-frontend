@@ -40,6 +40,11 @@ type CalculatorState = {
 };
 
 const DISALLOWED_CHARACTERS = /[^0-9.]/g;
+const MAX_DISPLAY_LENGTH = 10;
+
+function limitDisplayLength(value: string) {
+  return value.slice(0, MAX_DISPLAY_LENGTH);
+}
 
 function sanitizeDisplayValue(value: string) {
   return value.replace(DISALLOWED_CHARACTERS, "");
@@ -48,22 +53,27 @@ function sanitizeDisplayValue(value: string) {
 function normalizeDisplayValue(value: string) {
   const sanitized = sanitizeDisplayValue(value);
 
+  let normalized = sanitized;
+
   if (sanitized === ".") {
-    return "0.";
+    normalized = "0.";
+  } else {
+    const dotIndex = sanitized.indexOf(".");
+    if (dotIndex !== -1) {
+      normalized =
+        sanitized.slice(0, dotIndex + 1) +
+        sanitized.slice(dotIndex + 1).replace(/\./g, "");
+    }
   }
 
-  const dotIndex = sanitized.indexOf(".");
-  if (dotIndex !== -1) {
-    return (
-      sanitized.slice(0, dotIndex + 1) +
-      sanitized.slice(dotIndex + 1).replace(/\./g, "")
-    );
-  }
-
-  return sanitized;
+  return limitDisplayLength(normalized);
 }
 
 function appendCharacter(current: string, character: string) {
+  if (current.length >= MAX_DISPLAY_LENGTH) {
+    return current;
+  }
+
   if (character === ".") {
     if (current === "") {
       return "0.";
@@ -73,7 +83,7 @@ function appendCharacter(current: string, character: string) {
       return current;
     }
 
-    return `${current}.`;
+    return limitDisplayLength(`${current}.`);
   }
 
   return normalizeDisplayValue(current + character);
@@ -112,6 +122,7 @@ export default function Home() {
           type="text"
           inputMode="decimal"
           pattern="[0-9.]*"
+          maxLength={MAX_DISPLAY_LENGTH}
           value={display}
           onChange={(event) => handleDisplayChange(event.target.value)}
           onKeyDown={handleDisplayKeyDown}
