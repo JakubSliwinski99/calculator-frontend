@@ -269,6 +269,15 @@ export default function Home() {
     setDisplay(appendCharacter(base, button.label));
   }
 
+  function handleClear() {
+    setDisplay("");
+    setCalculatorState({
+      number: "",
+      operation: "",
+      willClearDisplay: false,
+    });
+  }
+
   return (
     <div
       className="flex flex-1 items-center justify-center bg-white p-8 max-[450px]:fixed max-[450px]:inset-0 max-[450px]:h-dvh max-[450px]:w-full max-[450px]:items-stretch max-[450px]:bg-[#2d2f36] max-[450px]:p-0"
@@ -293,6 +302,14 @@ export default function Home() {
         />
 
         <div className="flex min-h-0 flex-1 flex-col max-[450px]:justify-center">
+          <button
+            type="button"
+            onMouseDown={(event) => event.preventDefault()}
+            onClick={handleClear}
+            className={`mb-3 flex h-14 w-full items-center justify-center rounded-xl text-2xl font-bold text-white max-[450px]:rounded-lg max-[450px]:text-[clamp(1.5rem,6vw,2rem)] ${variantStyles.equals}`}
+          >
+            CLEAR
+          </button>
           <div className="grid grid-cols-4 gap-3">
             {BUTTONS.map((button) => (
               <button
