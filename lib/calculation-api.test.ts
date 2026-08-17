@@ -18,7 +18,7 @@ describe("calculate", () => {
       operation: "addition",
     });
 
-    expect(fetchMock).toHaveBeenCalledWith("http://localhost:8080/api/v1/calculation", {
+    expect(fetchMock).toHaveBeenCalledWith("/api/v1/calculation", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

@@ -1,4 +1,4 @@
-const API_BASE_URL = "http://localhost:8080";
+const API_PATH = "/api/v1/calculation";
 
 export type CalculationRequest = {
   number1: number;
@@ -14,7 +14,7 @@ export type CalculationResponse = {
 export async function calculate(
   request: CalculationRequest,
 ): Promise<CalculationResponse> {
-  const response = await fetch(`${API_BASE_URL}/api/v1/calculation`, {
+  const response = await fetch(API_PATH, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
